@@ -1,0 +1,17 @@
+version: "1"
+
+steps:
+  - name: build and push
+    image: plugins/docker
+    pull: always
+    parameters:
+      registry: ghcr.io
+      repo: ghcr.io/${VELA_REPO_ORG}/${VELA_REPO_NAME}
+      tags:
+        - ${VELA_BUILD_COMMIT:0:8}
+        - latest
+    secrets:
+        - source: docker_username
+          target: docker_username
+        - source: docker_password
+          target: docker_password
