@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"time"
 )
 
 type Weather struct {
@@ -11,6 +13,14 @@ type Weather struct {
 	Condition   string  `json:"condition"`
 	Humidity    int     `json:"humidity_pct"`
 	WindSpeed   float64 `json:"wind_speed_kmh"`
+}
+
+func loggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next(w, r)
+		log.Printf("%s %s %s", r.Method, r.URL.Path, time.Since(start))
+	}
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +35,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/", loggingMiddleware(indexHandler))
 	http.ListenAndServe(":8080", nil)
 }
