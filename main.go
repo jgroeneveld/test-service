@@ -1,20 +1,30 @@
 package main
 
 import (
-	"io"
+	"encoding/json"
 	"net/http"
 )
 
-func echoHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
-	io.Copy(w, r.Body)
+type Weather struct {
+	City        string  `json:"city"`
+	Temperature float64 `json:"temperature_c"`
+	Condition   string  `json:"condition"`
+	Humidity    int     `json:"humidity_pct"`
+	WindSpeed   float64 `json:"wind_speed_kmh"`
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(Weather{
+		City:        "Amsterdam",
+		Temperature: 7.4,
+		Condition:   "Partly cloudy",
+		Humidity:    78,
+		WindSpeed:   19.2,
+	})
 }
 
 func main() {
-	http.HandleFunc("/echo", echoHandler)
+	http.HandleFunc("/", indexHandler)
 	http.ListenAndServe(":8080", nil)
 }
