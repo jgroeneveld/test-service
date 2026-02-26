@@ -34,7 +34,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+}
+
 func main() {
 	http.HandleFunc("/", loggingMiddleware(indexHandler))
+	http.HandleFunc("/health", loggingMiddleware(healthHandler))
 	http.ListenAndServe(":8080", nil)
 }
