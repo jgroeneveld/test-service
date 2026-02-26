@@ -23,6 +23,7 @@ type Weather struct {
 var db *sql.DB
 
 func migrate() {
+	log.Println("running migrations...")
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS weather (
 		id          SERIAL PRIMARY KEY,
 		city        TEXT NOT NULL,
@@ -34,14 +35,18 @@ func migrate() {
 	if err != nil {
 		log.Fatalf("migrate: %v", err)
 	}
+	log.Println("migrations done")
 }
 
 func seed() {
+	log.Println("checking seed data...")
 	var count int
 	db.QueryRow(`SELECT COUNT(*) FROM weather`).Scan(&count)
 	if count > 0 {
+		log.Printf("seed skipped, %d rows already present", count)
 		return
 	}
+	log.Println("seeding weather data...")
 
 	rows := []Weather{
 		{City: "Amsterdam", Temperature: 7.4, Condition: "Partly cloudy", Humidity: 78, WindSpeed: 19.2},
